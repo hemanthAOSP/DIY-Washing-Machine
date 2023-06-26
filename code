@@ -1,0 +1,84 @@
+const int waterInPin = 2;        // Pin to control water inlet valve
+const int waterOutPin = 3;       // Pin to control water outlet valve
+const int motorPin = 4;          // Pin to control motor
+const int startButtonPin = 5;    // Pin for the start button
+const int modeButtonPin = 6;     // Pin for the mode selection button
+
+// Variables
+bool isRunning = false;
+int currentMode = 0;
+
+void setup() {
+  pinMode(waterInPin, OUTPUT);
+  pinMode(waterOutPin, OUTPUT);
+  pinMode(motorPin, OUTPUT);
+  pinMode(startButtonPin, INPUT_PULLUP);
+  pinMode(modeButtonPin, INPUT_PULLUP);
+  
+  digitalWrite(waterInPin, LOW);
+  digitalWrite(waterOutPin, LOW);
+  digitalWrite(motorPin, LOW);
+}
+
+void loop() {
+  // Check if the start button is pressed
+  if (digitalRead(startButtonPin) == LOW && !isRunning) {
+    // Start the washing machine
+    isRunning = true;
+    startWashing();
+  }
+  
+  // Check if the mode button is pressed
+  if (digitalRead(modeButtonPin) == LOW) {
+    // Change the washing mode
+    currentMode = (currentMode + 1) % 3;
+    delay(200);  // Debounce delay
+  }
+}
+
+void startWashing() {
+  // Step 1: Filling with water
+  digitalWrite(waterInPin, HIGH);    // Open water inlet valve
+  delay(5000);                       // Wait for 5 seconds to fill the tub
+  digitalWrite(waterInPin, LOW);     // Close water inlet valve
+  
+  // Step 2: Washing
+  switch (currentMode) {
+    case 0:  // Gentle mode
+      gentleWash();
+      break;
+    case 1:  // Normal mode
+      normalWash();
+      break;
+    case 2:  // Intense mode
+      intenseWash();
+      break;
+    default:
+      break;
+  }
+  
+  // Step 5: Stop
+  digitalWrite(motorPin, LOW);       // Turn off the motor
+  isRunning = false;                  // Set the running flag to false
+}
+
+void gentleWash() {
+  // Perform gentle washing steps
+  digitalWrite(motorPin, HIGH);      // Turn on the motor at a lower speed
+  delay(8000);                       // Wash for 8 seconds
+  digitalWrite(motorPin, LOW);       // Turn off the motor
+}
+
+void normalWash() {
+  // Perform normal washing steps
+  digitalWrite(motorPin, HIGH);      // Turn on the motor at medium speed
+  delay(10000);                      // Wash for 10 seconds
+  digitalWrite(motorPin, LOW);       // Turn off the motor
+}
+
+void intenseWash() {
+  // Perform intense washing steps
+  digitalWrite(motorPin, HIGH);      // Turn on the motor at high speed
+  delay(12000);                      // Wash for 12 seconds
+  digitalWrite(motorPin, LOW);       // Turn off the motor
+}
